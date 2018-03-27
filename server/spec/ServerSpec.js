@@ -116,4 +116,52 @@ describe('Node Server Request Listener Function', function() {
       });
   });
 
+  // 3 new tests written by Mo and Sam!
+  it('Internal Server results array should contain messages with unique objectIDs', function() {
+    var req = new stubs.request('/classes/messages', 'GET');
+    var res = new stubs.response();
+
+    handler.requestHandler(req, res);
+    
+    waitForThen(
+      function() {
+        var parsedBody = JSON.parse(res._data);
+        objectIds = [];
+        for (var i = 0; i < parsedBody.length; i++) {
+          objectIds.push(parsedBody[i].objectId);
+        }
+        var objectIdSet = new Set(objectIds);
+        console.log(objectIds);
+        console.log(objectIdSet);
+        expect(objectIds.length === objectIdSet.length).to.equal(true);
+      });
+  });
+
+  it('should 404 when attempting a DELETE request', function() {
+    var req = new stubs.request('/classes/messages', 'DELETE');
+    var res = new stubs.response();
+
+    handler.requestHandler(req, res);
+    
+    waitForThen(
+      function() { return res._ended; },
+      function() {
+        expect(res._responseCode).to.equal(404);
+      });
+  });
+
+
+  it('should 200 when server is getting a OPTIONS request', function() {
+    var req = new stubs.request('/classes/messages', 'OPTIONS');
+    var res = new stubs.response();
+
+    handler.requestHandler(req, res);
+    
+    waitForThen(
+      function() { return res._ended; },
+      function() {
+        expect(res._responseCode).to.equal(200);
+      });
+  });
+
 });

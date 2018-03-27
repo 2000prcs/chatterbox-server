@@ -1,5 +1,6 @@
 /* Import node's http module: */
 var http = require('http');
+var fs = require('fs');
 
 // Module.Exports gets created by JS when we export from request-handler, and when we import,
 // assign it to the object's property so we can access to the module 

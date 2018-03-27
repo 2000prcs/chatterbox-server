@@ -73,5 +73,39 @@ describe('server', function() {
     });
   });
 
+  
+  // 2 new tests written by Mo and Sam! (on top of the 3 in the other spec file!!!!)
+  it('Should provide socket error when asked using a request method other than GET, POST, PUT, DELETE, OPTIONS', function(done) {
+    var requestParams = {method: 'TUNNEL',
+      uri: 'http://127.0.0.1:3000/classes/messages',
+      json: {
+        username: 'Jono',
+        text: 'Do my bidding!'}
+    };
+
+    request(requestParams, 'http://127.0.0.1:3000/classes/messages', function(error, response, body) {
+      expect(error.toString()).to.equal('Error: socket hang up');
+      done();
+    });
+  });
+
+
+  it('should respond with ALL messages that were previously posted', function(done) {
+    var requestParams = {method: 'POST',
+      uri: 'http://127.0.0.1:3000/classes/messages',
+      json: {
+        username: 'Jono',
+        text: 'Do my bidding!'}
+    };
+
+    request(requestParams, function(error, response, body) {
+      // Now if we request the log, that message we posted should be there:
+      request('http://127.0.0.1:3000/classes/messages', function(error, response, body) {
+        var messages = JSON.parse(body).results;
+        expect(messages.length).to.equal(3);
+        done();
+      });
+    });
+  });
 
 });

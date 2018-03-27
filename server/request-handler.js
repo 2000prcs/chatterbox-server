@@ -1,4 +1,6 @@
+var fs = require('fs');
 /*************************************************************
+
 
 You should implement your request handler function in this file.
 
@@ -31,6 +33,13 @@ var defaultCorsHeaders = {
 };
 
 var requestHandler = function(request, response) {
+
+  // fs.readFile('../client/index.html', function(err, data){
+  //   response.writeHead(200, {'Content-Type' : 'text/html'});
+  //   response.write(data);
+  //   response.end();
+
+  // });
   // Request and Response come from node's http module.
   
   // Use ES6 Object destructuring to pull out relevant information from request
