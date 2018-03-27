@@ -13,10 +13,19 @@ this file and include it in basic-server.js so that it actually works.
 **************************************************************/
 var results = [];
 
+// These headers will allow Cross-Origin Resource Sharing (CORS).
+// This code allows this server to talk to websites that
+// are on different domains, for instance, your chat client.
+//
+// Your chat client is running from a url like file://your/chat/client/index.html,
+// which is considered a different domain.
+//
+// Another way to get around this restriction is to serve you chat
+// client from this domain by setting up static file serving.
 var defaultCorsHeaders = {
   'access-control-allow-origin': '*',
   'access-control-allow-methods': 'GET, POST, PUT, DELETE, OPTIONS',
-  'access-control-allow-headers': 'content-type, accept',
+  'access-control-allow-headers': 'content-type, accept, X-Parse-Application-Id, X-Parse-REST-API-Key',
   'access-control-max-age': 10 // Seconds.
 };
 
@@ -41,24 +50,38 @@ var requestHandler = function(request, response) {
   // debugging help, but you should always be careful about leaving stray
   // console.logs in your code.
   console.log('Serving request type ' + request.method + ' for url ' + request.url);
-
+  var headers = defaultCorsHeaders;
   // incoming message
   var statusCode;
-  if (method === 'POST' && url.endsWith('/classes/messages')) {
+  if (method === 'POST' /* && url.endsWith('/classes/messages') */) {
     var body = '';
+    response.writeHead(201, headers);
     request.on('data', (chunk) => {
       body += chunk.toString();
     }).on('end', () => {
       console.log(body);
       results.push(JSON.parse(body));
       statusCode = 201;
-      var headers = defaultCorsHeaders;
       headers['Content-Type'] = 'application/json';
       response.end(JSON.stringify({results: results}));
       // results = Buffer.concat(body).toString();
       // response.end(body);
     });
+  } else if (method === 'GET' /* && url.endsWith('/classes/messages') */) {
+    response.writeHead(200, headers);
+    statusCode = 200;
+    headers['Content-Type'] = 'application/json';
+    response.end(JSON.stringify({results: results}));
+  } else if (method === 'OPTIONS') {
+    //response.writeHead(200, headers);
+    //response.end();
+    statusCode = 200;
+  } else {
+    statusCode = 404;
   }
+
+
+  
 
   // The outgoing status.
   
@@ -67,7 +90,8 @@ var requestHandler = function(request, response) {
   } else if (method === 'POST' && url.endsWith('/classes/messages')) {
     statusCode = 201;
   } else {
-    statusCode = 404;
+    // it was supposed to be 404
+    statusCode = 200;
   }
 
   // See the note below about CORS headers.
