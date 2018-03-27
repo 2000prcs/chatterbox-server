@@ -1,5 +1,9 @@
 /* Import node's http module: */
 var http = require('http');
+
+// Module.Exports gets created by JS when we export from request-handler, and when we import,
+// assign it to the object's property so we can access to the module 
+
 var handleRequest = require('./request-handler.js');
 handleRequest = handleRequest.requestHandler;
 

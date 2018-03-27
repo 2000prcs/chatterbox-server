@@ -43,21 +43,31 @@ var requestHandler = function(request, response) {
   console.log('Serving request type ' + request.method + ' for url ' + request.url);
 
   // incoming message
-  var message;
-  var args = [...arguments];
-  message = (method === 'POST') ? request._postData : null; 
-  if (message !== null) {
-    results.push(message);
+  var statusCode;
+  if(method === 'POST' && url.endsWith('/classes/messages')){
+    var body = '';
+    request.on('data', (chunk) => {
+      body += chunk.toString();
+    }).on('end', () => {
+      console.log(body);
+      results.push(JSON.parse(body));
+      statusCode = 201;
+      var headers = defaultCorsHeaders;
+      headers['Content-Type'] = 'application/json';
+      response.end(JSON.stringify({results: results}));
+      // results = Buffer.concat(body).toString();
+      // response.end(body);
+    });
   }
-  
-  console.log(results);
 
   // The outgoing status.
-  var statusCode;
-  if (method === 'GET') {
+  
+  if (method === 'GET' && url.endsWith('/classes/messages')) {
     statusCode = 200;
-  } else {
+  } else if (method === 'POST' && url.endsWith('/classes/messages')) {
     statusCode = 201;
+  } else {
+    statusCode = 404;
   }
 
   // See the note below about CORS headers.
@@ -67,7 +77,7 @@ var requestHandler = function(request, response) {
   //
   // You will need to change this if you are sending something
   // other than plain text, like JSON or HTML.
-  headers['Content-Type'] = 'JSON';
+  headers['Content-Type'] = 'application/json';
 
   // .writeHead() writes to the request line and headers of the response,
   // which includes the status and all headers.
@@ -80,7 +90,7 @@ var requestHandler = function(request, response) {
   //
   // Calling .end "flushes" the response's internal buffer, forcing
   // node to actually send all the data over to the client.
-  response.end(JSON.stringify({'results': results}));
+  response.end(JSON.stringify({results: results}));
 };
 
 // These headers will allow Cross-Origin Resource Sharing (CORS).
