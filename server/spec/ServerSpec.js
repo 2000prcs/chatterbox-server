@@ -131,8 +131,6 @@ describe('Node Server Request Listener Function', function() {
           objectIds.push(parsedBody[i].objectId);
         }
         var objectIdSet = new Set(objectIds);
-        console.log(objectIds);
-        console.log(objectIdSet);
         expect(objectIds.length === objectIdSet.length).to.equal(true);
       });
   });

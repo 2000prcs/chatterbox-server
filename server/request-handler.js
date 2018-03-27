@@ -74,11 +74,9 @@ var requestHandler = function(request, response) {
         objectId++;
         parsedChunk.objectId = objectId;
         parsedChunk.createdAt = new Date();
-        console.log(parsedChunk);
         chunk = JSON.stringify(parsedChunk);
         body += chunk;
       }).on('end', () => {
-        console.log(body);
         results.push(JSON.parse(body));
       });
     } else if (method === 'GET') {
