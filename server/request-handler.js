@@ -11,7 +11,14 @@ this file and include it in basic-server.js so that it actually works.
 *Hint* Check out the node module documentation at http://nodejs.org/api/modules.html.
 
 **************************************************************/
-var results = [];
+var results = [{
+  username: 'Leader',
+  text: 'I am the best!',
+  roomname: 'lobby',
+  objectId: 1,
+}];
+// var objectId = 1;
+// increment objectID ? 
 
 // These headers will allow Cross-Origin Resource Sharing (CORS).
 // This code allows this server to talk to websites that
@@ -25,7 +32,7 @@ var results = [];
 var defaultCorsHeaders = {
   'access-control-allow-origin': '*',
   'access-control-allow-methods': 'GET, POST, PUT, DELETE, OPTIONS',
-  'access-control-allow-headers': 'content-type, accept, X-Parse-Application-Id, X-Parse-REST-API-Key',
+  'access-control-allow-headers': 'content-type, accept',
   'access-control-max-age': 10 // Seconds.
 };
 
@@ -50,6 +57,7 @@ var requestHandler = function(request, response) {
   // debugging help, but you should always be careful about leaving stray
   // console.logs in your code.
   console.log('Serving request type ' + request.method + ' for url ' + request.url);
+
   var headers = defaultCorsHeaders;
   // incoming message
   var statusCode;
@@ -57,11 +65,14 @@ var requestHandler = function(request, response) {
     var body = '';
     response.writeHead(201, headers);
     request.on('data', (chunk) => {
+      var parsedChunk = JSON.parse(chunk);
+      // objectId++;
+      // parsedChunk.objectId = objectId;
+      console.log(parsedChunk);
       body += chunk.toString();
     }).on('end', () => {
       console.log(body);
       results.push(JSON.parse(body));
-      statusCode = 201;
       headers['Content-Type'] = 'application/json';
       response.end(JSON.stringify({results: results}));
       // results = Buffer.concat(body).toString();
@@ -69,7 +80,6 @@ var requestHandler = function(request, response) {
     });
   } else if (method === 'GET' /* && url.endsWith('/classes/messages') */) {
     response.writeHead(200, headers);
-    statusCode = 200;
     headers['Content-Type'] = 'application/json';
     response.end(JSON.stringify({results: results}));
   } else if (method === 'OPTIONS') {
@@ -89,9 +99,11 @@ var requestHandler = function(request, response) {
     statusCode = 200;
   } else if (method === 'POST' && url.endsWith('/classes/messages')) {
     statusCode = 201;
-  } else {
+  } else if (method === 'OPTIONS') {
     // it was supposed to be 404
     statusCode = 200;
+  } else {
+    statusCode = 404;
   }
 
   // See the note below about CORS headers.
