@@ -44,7 +44,7 @@ var requestHandler = function(request, response) {
 
   // incoming message
   var statusCode;
-  if(method === 'POST' && url.endsWith('/classes/messages')){
+  if (method === 'POST' && url.endsWith('/classes/messages')) {
     var body = '';
     request.on('data', (chunk) => {
       body += chunk.toString();
